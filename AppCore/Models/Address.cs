@@ -2,11 +2,12 @@ using AppCore.ValueObjects;
 
 namespace AppCore.Models;
 
-public class Address
+public class Address : EntityBase
 {
-    public required int Id { get; set; }
-    public required string Street { get; set; }
-    public required string City  { get; set; }
-    public required string ZipCode { get; set; }
-    public required Country Country { get; set; }
+    public string Street { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
+    public string PostalCode { get; set; } = string.Empty;
+    public string Country { get; set; } = string.Empty;
+
+    public AddressType Type { get; set; } = AddressType.Main;
 }

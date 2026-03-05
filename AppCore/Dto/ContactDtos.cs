@@ -41,3 +41,37 @@ public record PagedResult<T>(
     public bool HasNext => Page < TotalPages;
     public bool HasPrevious => Page > 1;
 }
+
+public record CreatePersonDto(
+    string FirstName,
+    string LastName,
+    string Email,
+    string Phone,
+    string? Position,
+    DateTime? BirthDate,
+    Gender Gender,
+    Guid? EmployerId,
+    AddressDto? Address
+);
+
+public record UpdatePersonDto(
+    string? FirstName,
+    string? LastName,
+    string? Email,
+    string? Phone,
+    string? Position,
+    DateTime? BirthDate,
+    Gender? Gender,
+    Guid? EmployerId,
+    AddressDto? Address,
+    ContactStatus? Status
+);
+
+public record ContactSearchDto(
+    string? Query,
+    ContactStatus? Status,
+    string? Tag,
+    string? ContactType,
+    int Page = 1,
+    int PageSize = 20
+);
