@@ -1,3 +1,4 @@
+using AppCore.Models;
 using AppCore.ValueObjects;
 namespace AppCore.Dto;
 
@@ -28,6 +29,8 @@ public record PersonDto : ContactBaseDto
     public DateTime? BirthDate { get; init; }
     public Gender Gender { get; init; }
     public Guid? EmployerId { get; init; }
+    
+    public Guid? OrganizationId { get; init; }
 }
 
 public record PagedResult<T>(
@@ -51,6 +54,7 @@ public record CreatePersonDto(
     DateTime? BirthDate,
     Gender Gender,
     Guid? EmployerId,
+    Guid? OrganizationId,
     AddressDto? Address
 );
 
