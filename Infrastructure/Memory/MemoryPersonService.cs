@@ -18,7 +18,7 @@ public class MemoryPersonService(IContactUnitOfWork unitOfWork) : IPersonService
         return person is null ? null : PersonMapping.ToDto(person);
     }
 
-    public async Task<PersonDto> CreateAsync(CreatePersonDto dto)
+    public async Task<PersonDto> AddPerson(CreatePersonDto dto)
     {
         var entity = dto.ToEntity();
         var created = await unitOfWork.Persons.AddAsync(entity);
@@ -26,7 +26,7 @@ public class MemoryPersonService(IContactUnitOfWork unitOfWork) : IPersonService
         return PersonMapping.ToDto(created);
     }
 
-    public async Task<PersonDto> UpdateAsync(Guid id, UpdatePersonDto dto)
+    public async Task<PersonDto> UpdatePerson(Guid id, UpdatePersonDto dto)
     {
         var person = await unitOfWork.Persons.FindByIdAsync(id)
                      ?? throw new KeyNotFoundException($"Person with id {id} not found.");
