@@ -18,6 +18,7 @@ public static class PersonMapping
             EmployerId = person.EmployerId,
             Position = person.Position,
             OrganizationId = person.OrganizationId,
+            Notes = person.Notes.Select(x => new NoteDto(x.Id, x.Content, x.CreatedAt,  x.CreatedBy)).ToList(),
         };
     }
 

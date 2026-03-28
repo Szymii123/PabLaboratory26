@@ -44,4 +44,35 @@ public class ContactsController(IPersonService service): ControllerBase
         await service.DeleteAsync(id);
         return NoContent();
     }
+    
+    [HttpPost("{contactId:guid}/notes")]
+    [ProducesResponseType(typeof(NoteDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AddNote(
+        [FromRoute] Guid contactId,
+        [FromBody] CreateNoteDto dto)
+    {
+        var note = await service.AddNoteToPerson(contactId, dto);
+        return CreatedAtAction(
+            nameof(GetNotes),
+            new { contactId },
+            note);
+    }
+
+    [HttpGet("{contactId:guid}/notes")]
+    [ProducesResponseType(typeof(IEnumerable<NoteDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetNotes([FromRoute] Guid contactId)
+    {
+        var person = await service.FindByIdAsync(contactId);
+        return Ok(person.Notes);
+    }
+    
+    [HttpDelete("{contactId:guid}/notes/{noteId:guid}")]
+    public async Task<IActionResult> GetNotes([FromRoute] Guid contactId, [FromRoute] Guid noteId)
+    {
+        await service.DeleteNoteFromPerson(contactId, noteId);
+        return NoContent();
+    }
 }

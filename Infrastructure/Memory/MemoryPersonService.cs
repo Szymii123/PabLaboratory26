@@ -1,5 +1,7 @@
 using AppCore.Dto;
 using AppCore.Interfaces;
+using AppCore.Interfaces.Exceptions;
+using AppCore.Models;
 
 namespace Infrastructure.Memory;
 
@@ -54,6 +56,46 @@ public class MemoryPersonService(IContactUnitOfWork unitOfWork) : IPersonService
     {
         var people = await unitOfWork.Persons.FindByOrganizationAsync(organizationId);
         return ToAsync(people.Select(PersonMapping.ToDto));
+    }
+
+    public async Task<Note> AddNoteToPerson(Guid personId, CreateNoteDto createNoteDto)
+    {
+        var person = await unitOfWork.Persons.FindByIdAsync(personId);
+        
+        if(person is null)
+            throw new ContactNotFoundException($"Person with id={personId} not found!");
+
+        if (person.Notes is null)
+            person.Notes = new();
+
+        var note = new Note()
+        {
+            Content = createNoteDto.Content,
+            CreatedBy = $"{person.FirstName} {person.LastName}"
+        };
+        
+        person.Notes.Add(note); 
+        await unitOfWork.Persons.UpdateAsync(person);
+        await unitOfWork.SaveChangesAsync();
+        
+        return note;
+    }
+
+    public async Task DeleteNoteFromPerson(Guid personId, Guid noteId)
+    {
+        var person = await unitOfWork.Persons.FindByIdAsync(personId);
+        
+        if(person is null)
+            throw new ContactNotFoundException($"Person with id={personId} not found!");
+        
+        var note =  person.Notes.FirstOrDefault(n => n.Id == noteId);
+        
+        if(note is null)
+            throw new ContactNotFoundException($"Note with id={noteId} not found!");
+        
+        person.Notes.Remove(note);
+        await unitOfWork.Persons.UpdateAsync(person);
+        await unitOfWork.SaveChangesAsync();
     }
 
     private static async IAsyncEnumerable<PersonDto> ToAsync(IEnumerable<PersonDto> data)

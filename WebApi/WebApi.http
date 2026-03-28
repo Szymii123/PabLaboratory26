@@ -44,3 +44,16 @@ Content-Type: application/json
   "phone": "+48123456789",
   "address": null
 }
+
+### Dodawanie notatki do osoby o wskazanym id
+POST {{WebApi_HostAddress}}/api/contacts/f37b550c-2258-4eff-a594-971f36adadff/notes
+Content-Type: application/json
+{
+  "content": "Note"
+}
+### Wypisanie notatek osoby o wskazanym id 
+GET {{WebApi_HostAddress}}/api/contacts/4fbfdc9f-8bb3-4c25-9814-455fcb9778db/notes
+Content-Type: application/json
+
+### Usuwanie notatki o wskazanym id przypisanej do osoby o wskzanym id
+DELETE {{WebApi_HostAddress}}/api/contacts/4fbfdc9f-8bb3-4c25-9814-455fcb9778db/notes/1d7cc95f-374f-4209-8058-1721b40615be

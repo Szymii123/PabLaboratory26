@@ -29,7 +29,7 @@ public record PersonDto : ContactBaseDto
     public DateTime? BirthDate { get; init; }
     public Gender Gender { get; init; }
     public Guid? EmployerId { get; init; }
-    
+    public List<NoteDto> Notes { get; set; } = new();
     public Guid? OrganizationId { get; init; }
 }
 

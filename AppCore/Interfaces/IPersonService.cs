@@ -1,4 +1,5 @@
 using AppCore.Dto;
+using AppCore.Models;
 
 namespace AppCore.Interfaces;
 
@@ -11,4 +12,6 @@ public interface IPersonService
     Task DeleteAsync(Guid id);
     Task<IAsyncEnumerable<PersonDto>> FindPeopleFromCompany(Guid companyId);
     Task<IAsyncEnumerable<PersonDto>> FindPeopleFromOrganization(Guid organizationId);
+    Task<Note> AddNoteToPerson(Guid personId, CreateNoteDto createNoteDto);
+    Task DeleteNoteFromPerson(Guid personId, Guid noteId);
 }
