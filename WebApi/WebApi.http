@@ -46,14 +46,15 @@ Content-Type: application/json
 }
 
 ### Dodawanie notatki do osoby o wskazanym id
-POST {{WebApi_HostAddress}}/api/contacts/f37b550c-2258-4eff-a594-971f36adadff/notes
+POST {{WebApi_HostAddress}}/api/contacts/4da66355-1bb3-48e2-93e6-dffc87a9c2ea/notes
 Content-Type: application/json
+
 {
   "content": "Note"
 }
 ### Wypisanie notatek osoby o wskazanym id 
-GET {{WebApi_HostAddress}}/api/contacts/4fbfdc9f-8bb3-4c25-9814-455fcb9778db/notes
+GET {{WebApi_HostAddress}}/api/contacts/4da66355-1bb3-48e2-93e6-dffc87a9c2ea/notes
 Content-Type: application/json
 
 ### Usuwanie notatki o wskazanym id przypisanej do osoby o wskzanym id
-DELETE {{WebApi_HostAddress}}/api/contacts/4fbfdc9f-8bb3-4c25-9814-455fcb9778db/notes/1d7cc95f-374f-4209-8058-1721b40615be
+DELETE {{WebApi_HostAddress}}/api/contacts/4da66355-1bb3-48e2-93e6-dffc87a9c2ea/notes/636b95de-7023-4e1c-bf3b-d4cb11575a23

@@ -11,7 +11,9 @@ public class Person : Contact
     public Gender Gender { get; set; }
 
     public Guid? EmployerId { get; set; }
+    public Company? Employer { get; set; }
     public Guid? OrganizationId { get; set; }
+    public Organization? Organization { get; set; }
 
     public override string GetDisplayName()
         => $"{FirstName} {LastName}".Trim();

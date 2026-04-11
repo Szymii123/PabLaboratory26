@@ -1,5 +1,7 @@
 using AppCore.Interfaces;
 using AppCore.Module;
+using AppCore.Services;
+using Infrastructure;
 using Infrastructure.Memory;
 
 namespace WebApi;
@@ -14,12 +16,7 @@ public class Program
         builder.Services.AddAuthorization();
         builder.Services.AddContactsModule();
         builder.Services.AddControllers();
-        builder.Services.AddSingleton<ICustomerService, MemoryCustomerService>();
-        builder.Services.AddSingleton<IPersonRepository, MemoryPersonRepository>();
-        builder.Services.AddSingleton<IOrganizationRepository, MemoryOrganizationRepository>();
-        builder.Services.AddSingleton<ICompanyRepository, MemoryCompanyRepository>();
-        builder.Services.AddSingleton<IContactUnitOfWork, MemoryContactUnitOfWork>();
-        builder.Services.AddSingleton<IPersonService, MemoryPersonService>();
+        builder.Services.AddContactsEfModule(builder.Configuration);
 
         builder.Services.AddExceptionHandler<ProblemDetailsExceptionHandler>();
         builder.Services.AddProblemDetails();
