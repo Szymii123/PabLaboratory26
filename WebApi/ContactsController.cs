@@ -10,7 +10,7 @@ namespace WebApi;
 public class ContactsController(IPersonService service): ControllerBase
 {
 
-    public async Task<IActionResult> GetAllPersons(int page, int size)
+    public async Task<IActionResult> GetAllPersons(int page=1, int size=10)
     {
         return Ok(await service.FindAllPeoplePaged(page, size));
     }
