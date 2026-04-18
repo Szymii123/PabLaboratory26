@@ -1,13 +1,18 @@
 using AppCore.Interfaces;
+using AppCore.Interfaces.Authorization;
 using AppCore.Services;
 using Infrastructure.Context;
 using Infrastructure.Entities;
 using Infrastructure.Repositories;
+using Infrastructure.Security;
 using Infrastructure.UnitOfWork;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure;
 
@@ -20,6 +25,7 @@ public static class ContactsInfrastructureModule
         services.AddScoped<ICompanyRepository, EfCompanyRepository>();
         services.AddScoped<IPersonRepository, EfPersonRepository>();
         services.AddScoped<IOrganizationRepository, EfOrganizationRepository>();
+        services.AddScoped<IDataSeeder, IdentityDbSeeder>();
        
         services.AddScoped<IContactUnitOfWork, EfContactsUnitOfWork>();
         services.AddDbContext<ContactsDbContext>(options =>
@@ -39,6 +45,98 @@ public static class ContactsInfrastructureModule
         .AddEntityFrameworkStores<ContactsDbContext>()
         .AddDefaultTokenProviders();
         services.AddScoped<IPersonService, PersonService>();
+        services.AddScoped<IAuthService, AuthService>();
+        
+        return services;
+    }
+    
+    public static IServiceCollection AddJwt(this IServiceCollection services, JwtSettings jwtOptions)
+    {
+        services
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtOptions.Issuer,
+                        ValidAudience = jwtOptions.Audience,
+                        IssuerSigningKey = jwtOptions.GetSymmetricKey(),
+                        ClockSkew = TimeSpan.Zero // brak tolerancji czasu
+                    };
+                }
+            );
+        services.AddAuthorization(options =>
+        {
+            // Polityki oparte o role
+            // metoda RequireRole akceptuje dowolną liczbę parametrów typu string
+            options.AddPolicy(CrmPolicies.AdminOnly.ToString(), policy =>
+                policy.RequireRole(UserRole.Administrator.ToString()));
+
+
+            // dodaj politykę dla CrmPolicies.SalesAccess
+            // która wymaga użytkownika z jedną z ról: Administrator, SalesManager i Salesperson
+            options.AddPolicy(CrmPolicies.SalesAccess.ToString(), policy =>
+                policy.RequireRole(
+                    UserRole.Administrator.ToString(),
+                    UserRole.SalesManager.ToString(),
+                    UserRole.Salesperson.ToString()
+                    ));
+    
+            // dodaj politykę dla SalesManagerAccess
+            // która wymaga róli Administratora lub SalesManagera
+            options.AddPolicy(CrmPolicies.SalesManagerAccess.ToString(), policy =>
+                policy.RequireRole(
+                    UserRole.Administrator.ToString(),
+                    UserRole.SalesManager.ToString()
+                ));
+            
+            // dodaj politykę dla SuppportAccess
+            // która wymaga roli administratora lub SupportAgent'a
+            options.AddPolicy(CrmPolicies.SupportAccess.ToString(), policy =>
+                policy.RequireRole(
+                    UserRole.Administrator.ToString(),
+                    UserRole.SupportAgent.ToString()
+                ));
+           
+            // dodaj politykę ReadOnlyAccess
+            // która wymaga dowolnej roli
+            options.AddPolicy(CrmPolicies.ReadOnlyAccess.ToString(), policy =>
+                policy.RequireRole(
+                    UserRole.Administrator.ToString(),
+                    UserRole.SalesManager.ToString(),
+                    UserRole.Salesperson.ToString(),
+                    UserRole.SupportAgent.ToString(),
+                    UserRole.ReadOnly.ToString()
+                ));
+
+            // Polityka złożona — wymaga roli i aktywnego konta
+            options.AddPolicy(CrmPolicies.ActiveUser.ToString(), policy =>
+                policy
+                    .RequireAuthenticatedUser()
+                    .RequireClaim("status", SystemUserStatus.Active.ToString()));
+
+            // Polityka oparta o dział
+            options.AddPolicy(CrmPolicies.SalesDepartment.ToString(), policy =>
+                policy.RequireClaim("department", "Sales"));
+
+            // Domyślna polityka — każdy zalogowany użytkownik
+            options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+
+            // Polityka fallback — stosowana gdy brak atrybutu [Authorize]
+            options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+        });
         return services;
     }
 }

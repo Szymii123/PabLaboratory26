@@ -3,6 +3,7 @@ using AppCore.Interfaces;
 using AppCore.Models;
 using AppCore.ValueObjects;
 using Infrastructure.Entities;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ public class ContactsDbContext: IdentityDbContext<CrmUser, CrmRole, string>
     public DbSet<Person> People { get; set; }
     public DbSet<Company> Companies { get; set; }
     public DbSet<Organization> Organizations { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
